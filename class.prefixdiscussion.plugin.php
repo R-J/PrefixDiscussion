@@ -3,7 +3,7 @@
 $PluginInfo['PrefixDiscussion'] = array(
     'Name' => 'PrefixDiscussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
-    'Version' => '0.2',
+    'Version' => '0.3',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     'HasLocale' => true,
@@ -148,7 +148,7 @@ $Sender->AddJsFile('prefixdiscussion.js', 'plugins/PrefixDiscussion');
         $Sender->Discussion->Name = Wrap(
             $Prefix,
             'span',
-            array('class' => "PrefixDiscussion Sp{$Prefix}")
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $Prefix))
         ).$Sender->Discussion->Name;
    }
 
@@ -171,7 +171,7 @@ $Sender->AddJsFile('prefixdiscussion.js', 'plugins/PrefixDiscussion');
         $Sender->EventArguments['Discussion']->Name = Wrap(
             $Prefix,
             'span',
-            array('class' => "PrefixDiscussion Sp{$Prefix}")
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $Prefix))
         ).$Sender->EventArguments['Discussion']->Name;
     }
 
