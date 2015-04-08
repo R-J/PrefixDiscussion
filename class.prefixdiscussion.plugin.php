@@ -3,14 +3,15 @@
 $PluginInfo['PrefixDiscussion'] = array(
     'Name' => 'PrefixDiscussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
-    'Version' => '0.3',
+    'Version' => '0.4',
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'MobileFriendly' => true,
     'HasLocale' => true,
     'RegisterPermissions' => array(
         'Vanilla.PrefixDiscussion.Add',
         'Vanilla.PrefixDiscussion.View',
-        'Vanilla.PrefixDiscussion.Manage'),    
+        'Vanilla.PrefixDiscussion.Manage'
+    ),
     'Author' => 'Robin Jurinka',
     'SettingsUrl' => '/dashboard/settings/PrefixDiscussion',
     'SettingsPermission' => 'Vanilla.PrefixDiscussion.Manage',
@@ -35,19 +36,19 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @package PrefixDiscussion
      * @since 0.2
      */
-    public function GetPrefixes () {
+    public function getPrefixes () {
         // get prefixes from config
-        $Prefixes = array_filter(
+        $prefixes = array_filter(
             explode(
-                Gdn::Config('Plugins.PrefixDiscussion.ListSeparator', ';'),
-                Gdn::Config(
+                Gdn::config('Plugins.PrefixDiscussion.ListSeparator', ';'),
+                Gdn::config(
                     'Plugins.PrefixDiscussion.Prefixes',
                     'Question;Solved'
                 )
             )
         );
-        array_unshift($Prefixes, T('PrefixDiscussion.None', '-'));
-        return array_combine($Prefixes, $Prefixes);
+        array_unshift($prefixes, t('PrefixDiscussion.None', '-'));
+        return array_combine($prefixes, $prefixes);
     }
 
 
@@ -59,15 +60,15 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      */
     public function setup () {
         // init some config settings
-        if (!C('Plugins.PrefixDiscussion.ListSeparator')) {
-            SaveToConfig('Plugins.PrefixDiscussion.ListSeparator', ';');
-        }      
-        if (!C('Plugins.PrefixDiscussion.Prefixes')) {
-            SaveToConfig(
+        if (!c('Plugins.PrefixDiscussion.ListSeparator')) {
+            saveToConfig('Plugins.PrefixDiscussion.ListSeparator', ';');
+        }
+        if (!c('Plugins.PrefixDiscussion.Prefixes')) {
+            saveToConfig(
                 'Plugins.PrefixDiscussion.Prefixes',
                 'Question;Solved'
             );
-        }      
+        }
         // change db structure
         $this->structure();
     }
@@ -79,52 +80,53 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function structure() {
-        Gdn::Database()->Structure()
-            ->Table('Discussion')
-            ->Column('Prefix', 'varchar(64)', true)
-            ->Set();
+    public function structure () {
+        Gdn::database()->structure()
+            ->table('Discussion')
+            ->column('Prefix', 'varchar(64)', true)
+            ->set();
     }
 
 
     /**
      * Barebone config screen.
      *
+     * @param object $sender SettingsController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function settingsController_PrefixDiscussion_create ($Sender) {
-        $Sender->Permission('Vanilla.PrefixDiscussion.Manage');
-        $Sender->SetData('Title', T('Prefix Discussion Settings'));
-        $Sender->AddSideMenu('dashboard/settings/plugins');
-        $Conf = new ConfigurationModule($Sender);
-        $Conf->Initialize(array(
+    public function settingsController_prefixDiscussion_create ($sender) {
+        $sender->permission('Vanilla.PrefixDiscussion.Manage');
+        $sender->setData('Title', t('Prefix Discussion Settings'));
+        $sender->addSideMenu('dashboard/settings/plugins');
+        $configurationModule = new ConfigurationModule($sender);
+        $configurationModule->initialize(array(
             'Plugins.PrefixDiscussion.ListSeparator',
             'Plugins.PrefixDiscussion.Prefixes'
         ));
-        $Conf->RenderAll();
+        $configurationModule->renderAll();
     }
 
 
     /**
      * Render input box.
      *
-     * @param object $Sender PostController.
+     * @param object $sender PostController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function postController_beforeBodyInput_handler ($Sender) {
+    public function postController_beforeBodyInput_handler ($sender) {
         // only show dropdown if permission is set
-        if (!CheckPermission('Vanilla.PrefixDiscussion.Add')) {
+        if (!checkPermission('Vanilla.PrefixDiscussion.Add')) {
             return;
         }
         // maybe someone wants to style that
-        $Sender->AddCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
-$Sender->AddJsFile('prefixdiscussion.js', 'plugins/PrefixDiscussion');
+        $sender->addCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
+
         // render output
         echo '<div class="P PrefixDiscussion">';
-        echo $Sender->Form->Label(T('Discussion Prefix'), 'Prefix');
-        echo $Sender->Form->DropDown('Prefix', $this->GetPrefixes());
+        echo $sender->Form->label(t('Discussion Prefix'), 'Prefix');
+        echo $sender->Form->dropDown('Prefix', $this->getPrefixes());
         echo '</div>';
     }
 
@@ -132,91 +134,93 @@ $Sender->AddJsFile('prefixdiscussion.js', 'plugins/PrefixDiscussion');
     /**
      * Add prefix to discussion title.
      *
-     * @param object $Sender PostController.
+     * @param object $sender PostController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function discussionController_beforeDiscussionRender_handler ($Sender) {
-        if (!CheckPermission('Vanilla.PrefixDiscussion.View')) {
+    public function discussionController_beforeDiscussionRender_handler ($sender) {
+        if (!checkPermission('Vanilla.PrefixDiscussion.View')) {
             return;
         }
-        $Sender->AddCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
-        $Prefix = $Sender->Discussion->Prefix;
-        if ($Prefix == '') {
+        $sender->addCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
+        $prefix = $sender->Discussion->Prefix;
+        if ($prefix == '') {
             return;
         }
-        $Sender->Discussion->Name = Wrap(
-            $Prefix,
+        $sender->Discussion->Name = Wrap(
+            $prefix,
             'span',
-            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $Prefix))
-        ).$Sender->Discussion->Name;
-   }
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
+        ).$sender->Discussion->Name;
+    }
 
 
     /**
      * Add prefix to discussions lists.
      *
-     * @param object $Sender Vanilla controller.
+     * Does not work for table view since there is no appropriate event
+     * in Vanilla 2.1.
+     *
+     * @param object $sender Vanilla controller.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function base_beforeDiscussionName_handler ($Sender) {
-        if (!CheckPermission('Vanilla.PrefixDiscussion.View')) {
+    public function base_beforeDiscussionName_handler ($sender) {
+        if (!checkPermission('Vanilla.PrefixDiscussion.View')) {
             return;
         }
-        $Prefix = $Sender->EventArguments['Discussion']->Prefix;
-        if ($Prefix == '') {
+        $prefix = $sender->EventArguments['Discussion']->Prefix;
+        if ($prefix == '') {
             return;
         }
-        $Sender->EventArguments['Discussion']->Name = Wrap(
-            $Prefix,
+        $sender->EventArguments['Discussion']->Name = Wrap(
+            $prefix,
             'span',
-            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $Prefix))
-        ).$Sender->EventArguments['Discussion']->Name;
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
+        ).$sender->EventArguments['Discussion']->Name;
     }
 
 
     /**
      * Add css to discussions list if needed.
      *
-     * @param object $Sender DiscussionsController.
+     * @param object $sender DiscussionsController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function discussionsController_render_before ($Sender) {
-        if (!CheckPermission('Vanilla.PrefixDiscussion.View')) {
+    public function discussionsController_render_before ($sender) {
+        if (!checkPermission('Vanilla.PrefixDiscussion.View')) {
             return;
         }
-        $Sender->AddCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
-// $Sender->AddJsFile('prefixdiscussion.js', 'plugins/PrefixDiscussion');
+        $sender->addCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
     }
 
 
     /**
      * Add css to categories list if needed.
      *
-     * @param object $Sender DiscussionsController.
+     * @param object $sender DiscussionsController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function categoriesController_render_before ($Sender) {
-        if (!CheckPermission('Vanilla.PrefixDiscussion.View')) {
+    public function categoriesController_render_before ($sender) {
+        if (!checkPermission('Vanilla.PrefixDiscussion.View')) {
             return;
         }
-        $Sender->AddCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
+        $sender->addCssFile('prefixdiscussion.css', 'plugins/PrefixDiscussion');
     }
 
 
     /**
      * Delete "no prefix" placeholder from form fields before it gets written to db.
      *
-     * @param object $Sender DiscussionController.
+     * @param object $sender DiscussionController.
      * @package PrefixDiscussion
      * @since 0.1
      */
-    public function discussionModel_beforeSaveDiscussion_handler ($Sender) {
-        if ($Sender->EventArguments['FormPostValues']['Prefix'] == T('PrefixDiscussion.None', '-')) {
-            $Sender->EventArguments['FormPostValues']['Prefix'] = '';
+    public function discussionModel_beforeSaveDiscussion_handler ($sender) {
+        if ($sender->EventArguments['FormPostValues']['Prefix'] == t('PrefixDiscussion.None', '-')) {
+            $sender->EventArguments['FormPostValues']['Prefix'] = '';
         }
     }
 }
