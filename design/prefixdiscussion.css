@@ -3,12 +3,15 @@
     font-weight: heavy;
     font-size: smaller;
 }
-.Discussion .PrefixDiscussion:before, .DiscussionName .PrefixDiscussion:before{
+
+.Discussion .PrefixDiscussion:before, .DiscussionName .PrefixDiscussion:before {
     content: "[";
 }
-.Discussion .PrefixDiscussion:after, .DiscussionName  .PrefixDiscussion:after{
+
+.Discussion .PrefixDiscussion:after, .DiscussionName .PrefixDiscussion:after {
     content: "]";
 }
+
 .SpEye {
   background-color: blue;
   color: white;
