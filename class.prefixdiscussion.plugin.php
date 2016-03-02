@@ -49,7 +49,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
             )
         );
         $prefixes = array_combine($prefixes, $prefixes);
-        return array('' => t('PrefixDiscussion.None', '-')) + $prefixes;
+        return $prefixes;
     }
 
     /**
@@ -120,9 +120,10 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         $sender->addCssFile('prefixdiscussion.css', 'plugins/prefixDiscussion');
 
         // Render output.
+        $noPrefix = array('' => t('PrefixDiscussion.None', '-'));
         echo '<div class="P PrefixDiscussion">';
         echo $sender->Form->label('Discussion Prefix', 'Prefix');
-        echo $sender->Form->dropDown('Prefix', $this->getPrefixes());
+        echo $sender->Form->dropDown('Prefix', $noPrefix + $this->getPrefixes());
         echo '</div>';
     }
 
