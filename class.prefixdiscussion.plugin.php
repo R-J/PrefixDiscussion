@@ -49,7 +49,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
             )
         );
         $prefixes = array_combine($prefixes, $prefixes);
-        return ['' => t('PrefixDiscussion.None', '-')] + $prefixes;
+        return array('' => t('PrefixDiscussion.None', '-')) + $prefixes;
     }
 
     /**
