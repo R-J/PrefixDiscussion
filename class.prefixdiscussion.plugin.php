@@ -52,15 +52,33 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @since 0.2
      */
     public static function getPrefixes() {
-        // Get prefixes from config.
-        $prefixes = array_filter(
-            explode(
-                c('PrefixDiscussion.ListSeparator', self::getPrefixesSeparator()),
+        static $cachedPrefixes = null;
+
+        if ($cachedPrefixes === null) {
+            $cachedPrefixes = array();
+
+            // Get prefixes from config.
+            $prefixes = explode(
+                self::getPrefixesSeparator(),
                 c('PrefixDiscussion.Prefixes', 'Question'.self::getPrefixesSeparator().'Solved')
-            )
-        );
-        $prefixes = array_combine($prefixes, $prefixes);
-        return $prefixes;
+            );
+
+            // Trim and remove empty prefixes.
+            foreach ($prefixes as $index => $prefix) {
+                $prefix = trim($prefix);
+                if (strlen($prefix)) {
+                    $prefixes[$index] = $prefix;
+                } else {
+                    unset($prefixes[$index]);
+                }
+            }
+
+            if (count($prefixes)) {
+                $cachedPrefixes = array_combine($prefixes, $prefixes);
+            }
+        }
+
+        return $cachedPrefixes;
     }
 
     /**
