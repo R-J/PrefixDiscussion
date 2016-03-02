@@ -34,6 +34,17 @@ $PluginInfo['PrefixDiscussion'] = array(
  */
 class PrefixDiscussionPlugin extends Gdn_Plugin {
     /**
+     * Get the prefixes' separator
+     *
+     * @return string Prefix separator
+     * @package PrefixDiscussion
+     * @since 0.2
+     */
+    public function getPrefixesSeparator() {
+        return c('PrefixDiscussion.ListSeparator', ';');
+    }
+
+    /**
      * Get the list of prefixes
      *
      * @return array List of prefixes
@@ -44,8 +55,8 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         // Get prefixes from config.
         $prefixes = array_filter(
             explode(
-                Gdn::config('PrefixDiscussion.ListSeparator', ';'),
-                Gdn::config('PrefixDiscussion.Prefixes', 'Question;Solved')
+                c('PrefixDiscussion.ListSeparator', $this->getPrefixesSeparator()),
+                c('PrefixDiscussion.Prefixes', 'Question'.$this->getPrefixesSeparator().'Solved')
             )
         );
         $prefixes = array_combine($prefixes, $prefixes);
