@@ -38,7 +38,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      *
      * @return string Prefix separator
      * @package PrefixDiscussion
-     * @since 0.2
+     * @since 1.0
      */
     public static function getPrefixesSeparator() {
         return c('PrefixDiscussion.ListSeparator', ';');
