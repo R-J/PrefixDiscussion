@@ -1,6 +1,6 @@
 <?php
 
-$PluginInfo['prefixDiscussion'] = array(
+$PluginInfo['PrefixDiscussion'] = array(
     'Name' => 'Prefix Discussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
     'Version' => '1.0',
