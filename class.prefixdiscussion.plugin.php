@@ -40,7 +40,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @package PrefixDiscussion
      * @since 0.2
      */
-    public function getPrefixesSeparator() {
+    public static function getPrefixesSeparator() {
         return c('PrefixDiscussion.ListSeparator', ';');
     }
 
@@ -51,12 +51,12 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @package PrefixDiscussion
      * @since 0.2
      */
-    public function getPrefixes() {
+    public static function getPrefixes() {
         // Get prefixes from config.
         $prefixes = array_filter(
             explode(
-                c('PrefixDiscussion.ListSeparator', $this->getPrefixesSeparator()),
-                c('PrefixDiscussion.Prefixes', 'Question'.$this->getPrefixesSeparator().'Solved')
+                c('PrefixDiscussion.ListSeparator', self::getPrefixesSeparator()),
+                c('PrefixDiscussion.Prefixes', 'Question'.self::getPrefixesSeparator().'Solved')
             )
         );
         $prefixes = array_combine($prefixes, $prefixes);
@@ -134,7 +134,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         $noPrefix = array('' => t('PrefixDiscussion.None', '-'));
         echo '<div class="P PrefixDiscussion">';
         echo $sender->Form->label('Discussion Prefix', 'Prefix');
-        echo $sender->Form->dropDown('Prefix', $noPrefix + $this->getPrefixes());
+        echo $sender->Form->dropDown('Prefix', $noPrefix + self::getPrefixes());
         echo '</div>';
     }
 
