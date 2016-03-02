@@ -3,7 +3,7 @@
 $PluginInfo['PrefixDiscussion'] = array(
     'Name' => 'Prefix Discussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
-    'Version' => '1.0',
+    'Version' => '1.1',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
     'HasLocale' => true,
@@ -33,6 +33,23 @@ $PluginInfo['PrefixDiscussion'] = array(
  * @license MIT
  */
 class PrefixDiscussionPlugin extends Gdn_Plugin {
+    /**
+     * Class constructor
+     */
+    public function __construct() {
+        /*
+         * Before version 1.1, when a discussion used an empty prefix, an empty string was
+         * inserted inserted in the DB. Records that were created before the plugin was installed
+         * had NULL as value. It is generally not a good idea to mix empty strings and NULLs values.
+         */
+        $pluginEnabled = c('EnabledPlugins.PrefixDiscussion', false); // Can be false on plugin installation
+        $fixDone = c('PrefixDiscussion.PrefixMixingFixDone', false); // If we update from an older version
+        if ($pluginEnabled && !$fixDone) {
+            Gdn::sql()->query("update GDN_Discussion set Prefix = null where Prefix = ''", 'update');
+            saveToConfig('PrefixDiscussion.PrefixMixingFixDone', true);
+        }
+    }
+
     /**
      * Get the prefixes' separator
      *
@@ -91,6 +108,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         // Init some config settings.
         touchConfig(
             array(
+                'PrefixDiscussion.PrefixMixingFixDone' => true,
                 'PrefixDiscussion.ListSeparator' => ';',
                 'PrefixDiscussion.Prefixes' => 'Question;Solved'
             )
@@ -216,7 +234,6 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         $sender->addCssFile('prefixdiscussion.css', 'plugins/prefixDiscussion');
     }
 
-
     /**
      * Add css to categories list if needed.
      *
@@ -226,5 +243,19 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      */
     public function categoriesController_render_before($sender) {
         $sender->addCssFile('prefixdiscussion.css', 'plugins/prefixDiscussion');
+    }
+
+    /**
+     * Prevent from mixing NULLs and empty strings in the DB
+     *
+     * @param DiscussionModel $sender Sending controller instance.
+     * @param array $args Event arguments.
+     * @package PrefixDiscussion
+     * @since 1.1
+     */
+    public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
+        if ($args['FormPostValues']['Prefix'] === '') {
+            $args['FormPostValues']['Prefix'] = null;
+        }
     }
 }
