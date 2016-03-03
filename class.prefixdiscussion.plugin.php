@@ -39,7 +39,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
     public function __construct() {
         /*
          * Before version 1.1, when a discussion used an empty prefix, an empty string was
-         * inserted inserted in the DB. Records that were created before the plugin was installed
+         * inserted in the DB. Records that were created before the plugin was installed
          * had NULL as value. It is generally not a good idea to mix empty strings and NULLs values.
          */
         $pluginEnabled = c('EnabledPlugins.PrefixDiscussion', false); // Can be false on plugin installation
