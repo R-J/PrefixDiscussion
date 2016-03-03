@@ -81,14 +81,9 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
             );
 
             // Trim and remove empty prefixes.
-            foreach ($prefixes as $index => $prefix) {
-                $prefix = trim($prefix);
-                if (strlen($prefix)) {
-                    $prefixes[$index] = $prefix;
-                } else {
-                    unset($prefixes[$index]);
-                }
-            }
+            $prefixes = array_filter(
+                array_map('trim', $prefixes)
+            );
 
             if (count($prefixes)) {
                 $cachedPrefixes = array_combine($prefixes, $prefixes);
