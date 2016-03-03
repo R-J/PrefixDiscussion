@@ -45,7 +45,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         $pluginEnabled = c('EnabledPlugins.PrefixDiscussion', false); // Can be false on plugin installation
         $fixDone = c('PrefixDiscussion.PrefixMixingFixDone', false); // If we update from an older version
         if ($pluginEnabled && !$fixDone) {
-            Gdn::sql()->query("update GDN_Discussion set Prefix = null where Prefix = ''", 'update');
+            Gdn::sql()->update('Discussion', array('Prefix' => null), array('Prefix' => ''));
             saveToConfig('PrefixDiscussion.PrefixMixingFixDone', true);
         }
     }
