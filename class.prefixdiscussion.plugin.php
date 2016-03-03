@@ -191,10 +191,10 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         }
         $sender->addCssFile('prefixdiscussion.css', 'plugins/prefixDiscussion');
         $sender->Discussion->Name = wrap(
-                $prefix,
-                'span',
-                array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
-            ).$sender->Discussion->Name;
+            $prefix,
+            'span',
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
+        ).$sender->Discussion->Name;
     }
 
     /**
@@ -217,10 +217,10 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
             return;
         }
         $args['Discussion']->Name = wrap(
-                $prefix,
-                'span',
-                array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
-            ).$args['Discussion']->Name;
+            $prefix,
+            'span',
+            array('class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix))
+        ).$args['Discussion']->Name;
     }
 
     /**
