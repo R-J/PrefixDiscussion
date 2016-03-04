@@ -34,23 +34,6 @@ $PluginInfo['PrefixDiscussion'] = array(
  */
 class PrefixDiscussionPlugin extends Gdn_Plugin {
     /**
-     * Class constructor
-     */
-    public function __construct() {
-        /*
-         * Before version 1.1, when a discussion used an empty prefix, an empty string was
-         * inserted in the DB. Records that were created before the plugin was installed
-         * had NULL as value. It is generally not a good idea to mix empty strings and NULLs values.
-         */
-        $pluginEnabled = c('EnabledPlugins.PrefixDiscussion', false); // Can be false on plugin installation
-        $fixDone = c('PrefixDiscussion.PrefixMixingFixDone', false); // If we update from an older version
-        if ($pluginEnabled && !$fixDone) {
-            Gdn::sql()->update('Discussion', array('Prefix' => null), array('Prefix' => ''));
-            saveToConfig('PrefixDiscussion.PrefixMixingFixDone', true);
-        }
-    }
-
-    /**
      * Get the prefixes' separator
      *
      * @return string Prefix separator
@@ -103,7 +86,6 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         // Init some config settings.
         touchConfig(
             array(
-                'PrefixDiscussion.PrefixMixingFixDone' => true,
                 'PrefixDiscussion.ListSeparator' => ';',
                 'PrefixDiscussion.Prefixes' => 'Question;Solved'
             )
@@ -123,6 +105,17 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
             ->table('Discussion')
             ->column('Prefix', 'varchar(64)', true)
             ->set();
+
+        /*
+         * Before version 1.1, when a discussion used an empty prefix, an empty string was
+         * inserted in the DB. Records that were created before the plugin was installed
+         * had NULL as value. It is generally not a good idea to mix empty strings and NULLs values.
+         */
+        $fixDone = c('PrefixDiscussion.PrefixMixingFixDone', false); // If we update from an older version
+        if (!$fixDone) {
+            Gdn::sql()->update('Discussion', array('Prefix' => null), array('Prefix' => ''));
+            saveToConfig('PrefixDiscussion.PrefixMixingFixDone', true);
+        }
     }
 
     /**
