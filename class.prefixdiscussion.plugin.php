@@ -3,7 +3,7 @@
 $PluginInfo['PrefixDiscussion'] = array(
     'Name' => 'Prefix Discussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
-    'Version' => '1.1',
+    'Version' => '1.2',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
     'HasLocale' => true,
