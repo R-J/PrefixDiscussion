@@ -242,7 +242,7 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
      * @since 1.1
      */
     public function discussionModel_beforeSaveDiscussion_handler($sender, $args) {
-        if ($args['FormPostValues']['Prefix'] === '') {
+        if (!in_array($args['FormPostValues']['Prefix'], self::getPrefixes())) {
             $args['FormPostValues']['Prefix'] = null;
         }
     }
