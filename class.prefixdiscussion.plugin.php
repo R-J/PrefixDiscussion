@@ -111,12 +111,11 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
          * inserted in the DB. Records that were created before the plugin was installed
          * had NULL as value. It is generally not a good idea to mix empty strings and NULLs values.
          */
-        $fixDone = c('PrefixDiscussion.PrefixMixingFixDone', false); // If we update from an older version
-        if (!$fixDone) {
-            Gdn::sql()
-                ->update('Discussion')
-                ->set('Prefix', null)
-                ->where('Prefix', '');
+        if (c('PrefixDiscussion.PrefixMixingFixDone', false) != true) {
+            // If we update from an older version
+            $sql = clone Gdn::sql();
+            $sql->reset();
+            $sql->update('Discussion', ['Prefix' => null], ['Prefix' => '']);
             saveToConfig('PrefixDiscussion.PrefixMixingFixDone', true);
         }
     }
