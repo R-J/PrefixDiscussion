@@ -3,8 +3,8 @@
 $PluginInfo['PrefixDiscussion'] = [
     'Name' => 'Prefix Discussion',
     'Description' => 'Allows prefixing discussion titles with a configurable set of terms.',
-    'Version' => '1.3',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
+    'Version' => '1.4.0',
+    'RequiredApplications' => ['Vanilla' => '2.3'],
     'MobileFriendly' => true,
     'HasLocale' => true,
     'RegisterPermissions' => [
@@ -181,16 +181,20 @@ class PrefixDiscussionPlugin extends Gdn_Plugin {
         if (!checkPermission('Vanilla.PrefixDiscussion.View')) {
             return;
         }
-        $prefix = $sender->Discussion->Prefix;
+        $discussion = $sender->data('Discussion');
+        $prefix = val('Prefix', $discussion, '');
         if ($prefix == '') {
             return;
         }
         $sender->addCssFile('prefixdiscussion.css', 'plugins/prefixDiscussion');
-        $sender->Discussion->Name = wrap(
-            $prefix,
-            'span',
-            ['class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix)]
-        ).$sender->Discussion->Name;
+        $sender->setData(
+            'Discussion.Name',
+            wrap(
+                $prefix,
+                'span',
+                ['class' => 'PrefixDiscussion Sp'.str_replace(' ', '_', $prefix)]
+            ).$discussion->Name
+        );
     }
 
     /**
